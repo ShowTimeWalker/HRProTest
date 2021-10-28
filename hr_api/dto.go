@@ -15,6 +15,13 @@ type PRReq struct {
 	ReferrerPhone    string `json:"referrerPhone"`
 }
 
+type PICReq struct {
+	CardNumber string `json:"cardNumber"`
+	Name       string `json:"name"`
+	CouponId   string `json:"couponId"`
+	Sign       string `json:"sign"`
+}
+
 // PFRReq PostFaceRecognitionConfirm - PFR
 type PFRReq struct {
 	CardNumber string `json:"cardNumber"`
@@ -26,6 +33,17 @@ type PFRReq struct {
 
 // PRATReq PostRefreshAccessToken - PRAT
 type PRATReq struct {
-	RefreshToken string `json:"refreashToken"`
+	RefreshToken string `json:"refreshToken"`
 	SubaoId      string `json:"subaoId"`
+}
+
+// PULReq PostUserLogin - PUL
+type PULReq struct {
+	PhoneNumber  string   `json:"phoneNumber"`
+	PasswordSha1 string   `json:"passwordSha1"`
+	SubaoId      string   `json:"subaoId"`
+	Code         string   `json:"Code"`
+	EntranceType string   `json:"entranceType"`
+	CouponList   []string `json:"couponList"`
+	TaskList     []string `json:"taskList"`
 }

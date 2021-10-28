@@ -2,7 +2,6 @@ package hr_api
 
 import (
 	"encoding/json"
-	"net/http"
 )
 
 type RSP map[string]interface{}
@@ -14,7 +13,7 @@ func RandCodeRequest(phoneNumber string) RSP {
 		UserID:      "",
 	}
 	bodyJson, _ := json.Marshal(bodyStruct)
-	rsp := postAndPrintlnRes(bodyJson, url, http.MethodPost, map[string]string{"Authorization": Authorization})
+	rsp := postAndPrintlnRes(bodyJson, url, map[string]string{"Authorization": authorization})
 	return rsp
 }
 
@@ -28,7 +27,7 @@ func RegisterWithRandCode(randCode string, phoneNumber string) RSP {
 		ReferrerPhone:    "",
 	}
 	bodyJson, _ := json.Marshal(bodyStruct)
-	rsp := postAndPrintlnRes(bodyJson, url, http.MethodPost, map[string]string{"Authorization": Authorization})
+	rsp := postAndPrintlnRes(bodyJson, url, map[string]string{"Authorization": authorization})
 	return rsp
 }
 
@@ -37,13 +36,13 @@ func RefreshSession(token string, sessionId string, userId string, accessToken s
 		"?grant_type=refresh_token" + "&sessionId=" + sessionId + "&service=android"
 	bodyStruct := PRATReq{
 		RefreshToken: token,
-		SubaoId: "",
+		SubaoId:      "",
 	}
 	bodyJson, _ := json.Marshal(bodyStruct)
-	rsp := postAndPrintlnRes(bodyJson, url, http.MethodPost, map[string]string{
-		"Authorization": Authorization,
-		"userId": userId,
-		"accessToken": accessToken,
+	rsp := postAndPrintlnRes(bodyJson, url, map[string]string{
+		"Authorization": authorization,
+		"userId":        userId,
+		"accessToken":   accessToken,
 	})
 	return rsp
 }

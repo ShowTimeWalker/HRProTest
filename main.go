@@ -12,13 +12,29 @@ func main() {
 	registerRsp := RegisterWithRandCode(VerificationCode, phoneNumber)
 
 	// 刷新登录
+	userId := registerRsp["userInfo"].(map[string]interface{})["userId"].(string)
 	refreshToken := registerRsp["sessionInfo"].(map[string]interface{})["refreshToken"].(string)
 	sessionId := registerRsp["sessionInfo"].(map[string]interface{})["sessionId"].(string)
-	userId := registerRsp["userInfo"].(map[string]interface{})["userId"].(string)
 	accessToken := registerRsp["sessionInfo"].(map[string]interface{})["accessToken"].(string)
 	refreshRsp := RefreshSession(refreshToken, sessionId, userId, accessToken)
 
-	// 人像对比验证
+	// 用户登出
+	sessionId = refreshRsp["sessionId"].(string)
 	accessToken = refreshRsp["accessToken"].(string)
-	FaceComparison(Users, "tinyImage", userId, accessToken)
+	Logout(userId, accessToken, sessionId)
+
+	// 一键登录
+	loginRSP := Login(1, "", VerificationCode, phoneNumber)
+
+	// 姓名身份证号认证
+	userId = loginRSP["userInfo"].(map[string]interface{})["userId"].(string)
+	accessToken = loginRSP["sessionInfo"].(map[string]interface{})["accessToken"].(string)
+	IDNumberConfirm(IDNumberConfirmUsers, "normal", userId, accessToken)
+	// 查询用户权限
+	GetAccelGamePermission(userId, accessToken)
+
+	// 人像对比验证
+	FaceComparison(FaceComparisonUsers, "normal", userId, accessToken)
+	// 查询用户权限
+	GetAccelGamePermission(userId, accessToken)
 }

@@ -4,19 +4,44 @@ import (
 	. "../common_func"
 	"encoding/base64"
 	"encoding/json"
-	"net/http"
 	"os"
 )
 
-func FaceComparison(users map[string]faceRecognitionInfo, label string, userId string, accessToken string) RSP{
+func IDNumberConfirm(users map[string]idNumberConfirmInfo, label string, userId string, accessToken string) RSP {
+	userName := users[label].userName
+	userCardNumber := users[label].idNumber
+
+	md5Sign := "cardNumber=" + userCardNumber +
+		"&" + "couponId=" + couponId +
+		"&" + "name=" + userName +
+		"&" + "key=" + clientKey
+	md5Sign = MD5(md5Sign)
+
+	url := devServerUrlHead + "/api/v1/android/users/" + userId + "/identity/confirmation"
+
+	body := PICReq{
+		CardNumber: userCardNumber,
+		Name:       "王新平",
+		CouponId:   couponId,
+		Sign:       md5Sign,
+	}
+	jsonBody, _ := json.Marshal(body)
+	rsp := postAndPrintlnRes(jsonBody, url, map[string]string{
+		"Authorization": authorization,
+		"accessToken":   accessToken,
+	})
+	return rsp
+}
+
+func FaceComparison(users map[string]faceRecognitionInfo, label string, userId string, accessToken string) RSP {
 	userName := users[label].userName
 	userCardNumber := users[label].idNumber
 	imageUrl := users[label].imageUrl
 
 	md5Sign := "cardNumber=" + userCardNumber +
-		"&" + "couponId=" + CouponId +
+		"&" + "couponId=" + couponId +
 		"&" + "name=" + userName +
-		"&" + "key=" + ClientKey
+		"&" + "key=" + clientKey
 	md5Sign = MD5(md5Sign)
 
 	imageFile, _ := os.Open(imageUrl)
@@ -29,17 +54,26 @@ func FaceComparison(users map[string]faceRecognitionInfo, label string, userId s
 	n, _ := imageFile.Read(imageBuffer)
 	imageBase64Str := base64.StdEncoding.EncodeToString(imageBuffer[:n])
 
-	PFRUrl := "http://dev.xunyou.mobi/api/v1/android/users/" + userId + "/identity/face_recognition"
-	PFRBody := PFRReq{
+	url := devServerUrlHead + "/api/v1/android/users/" + userId + "/identity/face_recognition"
+	body := PFRReq{
 		CardNumber: userCardNumber,
 		Name:       "王新平",
-		CouponId:   CouponId,
+		CouponId:   couponId,
 		Sign:       md5Sign,
 		Base64Str:  imageBase64Str,
 	}
-	PFRJsonBody, _ := json.Marshal(PFRBody)
-	rsp := postAndPrintlnRes(PFRJsonBody, PFRUrl, http.MethodPost, map[string]string{
-		"Authorization": Authorization,
+	jsonBody, _ := json.Marshal(body)
+	rsp := postAndPrintlnRes(jsonBody, url, map[string]string{
+		"Authorization": authorization,
+		"accessToken":   accessToken,
+	})
+	return rsp
+}
+
+func GetAccelGamePermission(userId string, accessToken string) RSP {
+	url := devServerUrlHead + "/api/v1/android/users/" + userId + "/accel_game/permission"
+	rsp := GetAndPrintRes(url, map[string]string{
+		"Authorization": authorization,
 		"accessToken":   accessToken,
 	})
 	return rsp
